@@ -1,0 +1,86 @@
+<!DOCTYPE html> <!-- Define que el documento es HTML5 -->
+<html>
+<head>
+  <meta charset="UTF-8"> <!-- Establece la codificación de caracteres como UTF-8 -->
+  <title>Seguridad - Ubicación de Emergencia</title> <!-- Título que aparece en la pestaña del navegador -->
+  <style>
+    body {
+      font-family: Arial, sans-serif; /* Tipo de fuente del texto */
+      padding: 20px; /* Espaciado interno del cuerpo */
+      background-color: #f2f2f2; /* Color de fondo claro */
+      text-align: center;/*Alineacion de texto al centro/
+    }
+    #ubicacion {
+      margin-top: 10px; /* Espacio superior */
+      font-size: 18px; /* Tamaño de fuente */
+      color: #333; /* Color del texto */
+    }
+    #enlaceWhatsapp {
+      display: none; /* Oculta el botón hasta que se obtenga la ubicación */
+      margin-top: 20px; /* Espacio superior */
+      background-color: #25D366; /* Color verde de WhatsApp */
+      color: white; /* Texto blanco */
+      padding: 12px 20px; /* Espaciado interno del botón */
+      border-radius: 6px; /* Bordes redondeados */
+      text-decoration: none; /* Quita el subrayado del enlace */
+      font-weight: bold; /* Texto en negrita */
+    }
+  </style>
+</head>
+<body>
+  <h2>📍 Ubicación de Emergencia</h2> <!-- Título principal en la página -->
+  <div id="ubicacion">Obteniendo ubicación...</div> <!-- Mensaje inicial mientras se obtiene la ubicación -->
+  <a id="enlaceWhatsapp" href="#" target="_blank">Enviar ubicación por WhatsApp</a> <!-- Botón oculto que se mostrará luego -->
+
+  <script>
+    // Función que obtiene la ubicación del usuario
+    function obtenerUbicacion() {
+      if ("geolocation" in navigator) { // Verifica si el navegador soporta geolocalización
+        navigator.geolocation.getCurrentPosition(
+          function(pos) { // Si se obtiene la ubicación correctamente
+            var lat = pos.coords.latitude.toFixed(6); // Redondea la latitud a 6 decimales
+            var lon = pos.coords.longitude.toFixed(6); // Redondea la longitud a 6 decimales
+
+            // Muestra la latitud y longitud en pantalla
+            document.getElementById("ubicacion").innerHTML =
+              "Latitud: " + lat + "<br>Longitud: " + lon;
+
+            // Crea el mensaje de alerta con enlace a Google Maps
+            var mensaje = "🚨 Estoy en peligro. Mi ubicación es: https://www.google.com/maps?q=" + lat + "," + lon;
+
+            var numero = "59164888073"; // Número de destino en formato internacional (Bolivia)
+            var enlace = "https://wa.me/" + numero + "?text=" + encodeURIComponent(mensaje); // Crea el enlace de WhatsApp con el mensaje
+
+            var boton = document.getElementById("enlaceWhatsapp"); // Obtiene el botón por su ID
+            boton.href = enlace; // Asigna el enlace generado al botón
+            boton.style.display = "inline-block"; // Muestra el botón en pantalla
+          },
+          function(error) { // Si ocurre un error al obtener la ubicación
+            let mensaje = "";
+            switch(error.code) {
+              case error.PERMISSION_DENIED:
+                mensaje = "Permiso de ubicación denegado."; // El usuario no permitió acceso
+                break;
+              case error.POSITION_UNAVAILABLE:
+                mensaje = "Ubicación no disponible."; // No se pudo obtener la ubicación
+                break;
+              case error.TIMEOUT:
+                mensaje = "Tiempo de espera agotado."; // La solicitud tardó demasiado
+                break;
+              default:
+                mensaje = "Error desconocido."; // Otro tipo de error
+            }
+            document.getElementById("ubicacion").innerHTML = mensaje; // Muestra el mensaje de error
+          }
+        );
+      } else {
+        // Si el navegador no soporta geolocalización
+        document.getElementById("ubicacion").innerHTML = "Tu navegador no soporta geolocalización.";
+      }
+    }
+
+    // Ejecuta la función cuando la página termina de cargar
+    document.addEventListener("DOMContentLoaded", obtenerUbicacion);
+  </script>
+</body>
+</html>
